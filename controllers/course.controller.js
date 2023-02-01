@@ -3,9 +3,27 @@ const router = express.Router();
 const Course = require("../models/model.course.js");
 
 router.get("/", async (req, res) => {
+  const currentPage = +req.query.page;
+  const coursesPerPage = +req.query.limit;
+  const totalCourses = await Course.countDocuments();
+  const totalPages = Math.ceil(totalCourses / coursesPerPage);
   try {
-    const courses = await Course.find({}).lean().exec();
-    res.send({ count: courses.length, data: courses });
+    const courses = await Course.find({})
+      .skip(
+        currentPage === 1 ? 0 : coursesPerPage * currentPage - coursesPerPage
+      )
+      .limit(coursesPerPage)
+      .sort({ views: -1 })
+      .lean()
+      .exec();
+    res.send({
+      totalCourses,
+      coursesPerPage,
+      currentPage,
+      totalPages,
+      coursesInThisPage: courses.length,
+      data: courses,
+    });
   } catch (err) {
     console.log("Error", err);
   }

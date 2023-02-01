@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(bodyparser.json());
 
 const courseController = require("./controllers/course.controller");
-app.use("/courses", authenticate, courseController);
+app.use("/courses",  courseController);
 
 const authController = require("./controllers/auth.controller");
 app.use("/users", authController);

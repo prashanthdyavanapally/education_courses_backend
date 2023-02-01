@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const newToken = (user) => {
-  return jwt.sign({ user }, process.env.JWT_SECRET_KEY, { expiresIn: "10s" });
+  return jwt.sign({ user }, process.env.JWT_SECRET_KEY);
 };
 
 router.get("/", async (req, res) => {
