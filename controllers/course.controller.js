@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
   const totalPages = Math.ceil(totalCourses / coursesPerPage);
   try {
     const courses = await Course.find({})
-      .populate({ path: "author", select: "name email -_id" })
+      .populate({ path: "author", select: "firstName email -_id" })
       .skip(
         currentPage === 1 ? 0 : coursesPerPage * currentPage - coursesPerPage
       )
