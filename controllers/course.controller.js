@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const Course = require("../models/model.course.js");
 
+const Course = require("../models/course.model");
+
+// Get all courses
 router.get("/", async (req, res) => {
   const currentPage = +req.query.page;
   const coursesPerPage = +req.query.limit;
@@ -9,6 +11,7 @@ router.get("/", async (req, res) => {
   const totalPages = Math.ceil(totalCourses / coursesPerPage);
   try {
     const courses = await Course.find({})
+      .populate({ path: "author", select: "name email -_id" })
       .skip(
         currentPage === 1 ? 0 : coursesPerPage * currentPage - coursesPerPage
       )
@@ -16,55 +19,70 @@ router.get("/", async (req, res) => {
       .sort({ views: -1 })
       .lean()
       .exec();
-    res.send({
-      totalCourses,
-      coursesPerPage,
-      currentPage,
-      totalPages,
-      coursesInThisPage: courses.length,
-      data: courses,
-    });
-  } catch (err) {
-    console.log("Error", err);
-  }
-});
-
-router.get("/:id", async (req, res) => {
-  try {
-    const course = await Course.find({ _id: req.params.id }).lean().exec();
-    res.status(200).send({ data: course });
-  } catch (err) {
-    console.log("Error", err);
-  }
-});
-
-router.post("/", async (req, res) => {
-  try {
-    const course = await Course.findOne({ name: req.body.name });
-    if (course) {
-      res.status(403).send("Course already exists");
+    if (!currentPage && !coursesPerPage) {
+      return res.send({
+        totalCourses,
+        courses,
+      });
     } else {
-      const course = await Course.create(req.body);
-      res.status(201).send({ data: course });
+      return res.send({
+        totalCourses,
+        coursesPerPage,
+        currentPage,
+        totalPages,
+        coursesInThisPage: courses.length,
+        courses,
+      });
     }
   } catch (err) {
     console.log("Error", err);
   }
 });
 
-router.put("/:id", async (req, res) => {
+// Get a single course
+router.get("/:id", async (req, res) => {
   try {
-    const course = await Course.findByIdAndUpdate(req.params.id, req.body);
-    res.status(200).send({ data: course });
+    const course = await Course.find({ _id: req.params.id }).lean().exec();
+    return res.status(200).send({ data: course });
   } catch (err) {
     console.log("Error", err);
   }
 });
 
+// Create a course
+router.post("/", async (req, res) => {
+  try {
+    const course = await Course.findOne({ name: req.body.name }).lean().exec();
+    if (course) {
+      return res.status(403).send("Course already exists");
+    } else {
+      const course = await Course.create(req.body);
+      return res.status(201).send({ data: course });
+    }
+  } catch (err) {
+    console.log("Error", err);
+  }
+});
+
+// Update a course
+router.put("/:id", async (req, res) => {
+  try {
+    const course = await Course.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    })
+      .lean()
+      .exec();
+    return res.status(200).send({ data: course });
+  } catch (err) {
+    console.log("Error", err);
+  }
+});
+
+// Delete a course
 router.delete("/:id", async (req, res) => {
   try {
     const course = await Course.findByIdAndDelete(req.params.id);
-    res.status(200).send({ data: course });
+    return res.status(200).send({ data: course });
   } catch (err) {
     console.log("Error", err);
   }

@@ -2,7 +2,11 @@ const mongoose = require("mongoose");
 
 const courseSchema = mongoose.Schema({
   name: { type: "String", required: [true, "Course name is required"] },
-  author: { type: "String", required: [true, "Author is required"] },
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "author",
+    required: [true, "Author is required"],
+  },
   image: { type: "String", required: [true, "Image is required"] },
   price: { type: "Number", required: [true, "Price is required"] },
   summary: { type: "String", required: [true, "Summary is required"] },
@@ -16,6 +20,3 @@ const courseSchema = mongoose.Schema({
 const Course = new mongoose.model("course", courseSchema);
 
 module.exports = Course;
-
-// name: { type: "String" },
-// email: { type: "String" },

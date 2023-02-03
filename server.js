@@ -15,11 +15,8 @@ app.use("/courses", authenticate, courseController);
 const authController = require("./controllers/auth.controller");
 app.use("/users", authController);
 
-// const signupController = require("./controllers/signupRoute");
-// app.use("/register", signupController);
-
-// const loginController = require("./controllers/loginRoute");
-// app.use("/login", loginController);
+const authorController = require("./controllers/author.controller");
+app.use("/authors", authorController);
 
 app.listen(port, async () => {
   try {
