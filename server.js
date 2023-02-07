@@ -9,8 +9,13 @@ const authenticate = require("./middlewares/authenticate");
 app.use(express.json());
 app.use(bodyparser.json());
 
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./swagger.json");
+
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 const courseController = require("./controllers/course.controller");
-app.use("/courses", authenticate, courseController);
+app.use("/courses",authenticate, courseController);
 
 const authController = require("./controllers/auth.controller");
 app.use("/users", authController);
